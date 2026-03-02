@@ -55,7 +55,7 @@ pipeline {
                 subject: "SPE Build Status: ${currentBuild.fullDisplayName}",
                 body: """Build ${currentBuild.result} for project ${env.JOB_NAME}.
                          Check the console output here: ${env.BUILD_URL}""",
-                to: 'your-email@example.com'
+                to: 'mihirbindal3@gmail.com'
             )
         }
     }
