@@ -16,7 +16,7 @@ def test_divide():
     assert divide(10, 0) == "Error: Division by zero"
 
 def test_square_root():
-    assert square_root(16) == 3
+    assert square_root(16) == 4
 
 def test_factorial():
     assert factorial(5) == 120
