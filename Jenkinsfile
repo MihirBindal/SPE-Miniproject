@@ -17,11 +17,8 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 // Installs pytest and tests your calculator logic
-                sh '''
-                    python3 -m venv myenv
-                    ./myenv/bin/pip install pytest
-                    ./myenv/bin/pytest test_calculator.py
-                '''
+                sh 'pip install -r requirements.txt --break-system-packages'
+                sh 'pytest test.py'
             }
         }
 
