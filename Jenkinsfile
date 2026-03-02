@@ -1,53 +1,44 @@
 pipeline {
     agent any
-    
-    environment {
-        DEVELOPER_EMAIL = 'mihirbindal3@gmail.com' // UPDATE THIS TO YOUR EMAIL!
-    }
 
-    // TA REQUIREMENT: Poll SCM as a backup to the webhook
-    triggers {
-        pollSCM('* * * * *') 
+    environment {
+        DOCKER_IMAGE_NAME = 'scientific-calculator'
+        DOCKER_HUB_USERNAME = 'mihirbindal'
     }
 
     stages {
-        stage('Clone Git') {
+        stage('Checkout Code') {
             steps {
-                // checkout scm automatically uses the repo configured in the Jenkins job
+                // This tells Jenkins to pull the code using the GitHub credentials you will select in the UI
                 checkout scm
             }
         }
 
-        stage('Install Dependencies & Test') {
+        stage('Run Unit Tests') {
             steps {
-                sh 'pip install -r requirements.txt'
-                // TA REQUIREMENT: Generate an XML test report
-                sh 'pytest test.py --junitxml=test-results.xml'
+                // Installs pytest and tests your calculator logic
+                sh 'pip install pytest'
+                sh 'pytest test_calculator.py'
             }
-            post {
-                always {
-                    // Tell Jenkins to display the test results graph on the dashboard
-                    junit 'test-results.xml' 
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                // Builds the image using your Dockerfile
+                sh "docker build -t ${DOCKER_IMAGE_NAME} ."
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    // Jenkins uses your newly set up credentials to log in and push
+                    docker.withRegistry('', 'dockerhubcredentials') {
+                        sh "docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
+                        sh "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
+                    }
                 }
             }
-        }
-    }
-    
-    // TA REQUIREMENT: Email Notifications
-    post {
-        success {
-            mail to: "${DEVELOPER_EMAIL}",
-                 subject: "SUCCESS: Jenkins Webhook Test #${env.BUILD_NUMBER}",
-                 body: "Great job! The GitHub Webhook, Ngrok, and Email plumbing work perfectly!"
-        }
-        failure {
-            mail to: "${DEVELOPER_EMAIL}",
-                 subject: "FAILED: Jenkins Build #${env.BUILD_NUMBER}",
-                 body: "Alert! The pipeline failed. Please check the Jenkins console logs."
-        }
-        always {
-            // Clean up the workspace to save hard drive space
-            cleanWs()
         }
     }
 }
