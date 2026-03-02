@@ -16,7 +16,7 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 sh 'pip install -r requirements.txt --break-system-packages'
-                sh 'pytest test_calculator.py'
+                sh 'pytest test.py'
             }
         }
 
