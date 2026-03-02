@@ -52,10 +52,9 @@ pipeline {
     post {
         always {
             emailext (
-                subject: "SPE Build Status: ${currentBuild.fullDisplayName}",
-                body: """Build ${currentBuild.result} for project ${env.JOB_NAME}.
-                         Check the console output here: ${env.BUILD_URL}""",
                 to: 'mihirbindal3@gmail.com'
+                subject: "SPE Build Status: ${currentBuild.fullDisplayName}",
+                body: "Build ${currentBuild.result} for project ${env.JOB_NAME}. Check console: ${env.BUILD_URL}"
             )
         }
     }
