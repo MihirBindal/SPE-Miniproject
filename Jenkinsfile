@@ -9,22 +9,19 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                // This tells Jenkins to pull the code using the GitHub credentials you will select in the UI
                 checkout scm
             }
         }
 
         stage('Run Unit Tests') {
             steps {
-                // Installs pytest and tests your calculator logic
                 sh 'pip install -r requirements.txt --break-system-packages'
-                sh 'pytest test.py'
+                sh 'pytest test_calculator.py'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                // Builds the image using your Dockerfile
                 sh "docker build -t ${DOCKER_IMAGE_NAME} ."
             }
         }
@@ -32,7 +29,6 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Jenkins uses your newly set up credentials to log in and push
                     docker.withRegistry('', 'dockerhubcredentials') {
                         sh "docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
                         sh "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
@@ -47,9 +43,20 @@ pipeline {
                     ansiblePlaybook(
                         playbook: 'deploy.yml',
                         inventory: 'inventory'
-                        )
-                    }
+                    )
                 }
             }
         }
     }
+
+    post {
+        always {
+            emailext (
+                subject: "SPE Build Status: ${currentBuild.fullDisplayName}",
+                body: """Build ${currentBuild.result} for project ${env.JOB_NAME}.
+                         Check the console output here: ${env.BUILD_URL}""",
+                to: 'your-email@example.com'
+            )
+        }
+    }
+}
