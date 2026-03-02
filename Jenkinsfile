@@ -29,6 +29,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
+                    // This uses your 'dockerhubcredentials' global ID
                     docker.withRegistry('', 'dockerhubcredentials') {
                         sh "docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
                         sh "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
@@ -52,7 +53,7 @@ pipeline {
     post {
         always {
             emailext (
-                to: 'mihirbindal3@gmail.com'
+                to: 'mihirbindal3@gmail.com',
                 subject: "SPE Build Status: ${currentBuild.fullDisplayName}",
                 body: "Build ${currentBuild.result} for project ${env.JOB_NAME}. Check console: ${env.BUILD_URL}"
             )
