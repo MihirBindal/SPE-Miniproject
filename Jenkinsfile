@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    triggers {
+        pollSCM('* * * * *') 
+    }
 
     environment {
         DOCKER_IMAGE_NAME = 'scientific-calculator'
@@ -29,7 +32,6 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // This uses your 'dockerhubcredentials' global ID
                     docker.withRegistry('', 'dockerhubcredentials') {
                         sh "docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
                         sh "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"

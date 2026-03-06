@@ -33,7 +33,7 @@ def menu():
     print("2. Subtraction (-)")
     print("3. Multiplication (*)")
     print("4. Division (/)")
-    print("5. Square Root (√x)")
+    print("5. Square Root (root(x))")
     print("6. Factorial (x!)")
     print("7. Natural Log (ln(x))")
     print("8. Power (x^b)")
